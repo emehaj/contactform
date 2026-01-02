@@ -1,0 +1,190 @@
+:root {
+    /* Primary */
+    --green200: hsl(148, 38%, 91%);
+    --green600: hsl(169, 82%, 27%);
+    --red: hsl(0, 66%, 54%);
+
+    /* Neutral */
+    --white: hsl(0, 0%, 100%);
+    --grey500: hsl(186, 15%, 59%);
+    --grey900: hsl(187, 24%, 22%);
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    font-family: "Karla", sans-serif;
+    padding: 50px 20px;
+    background-color: var(--green200);
+}
+
+main {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: var(--white);
+
+    & > form {
+        display: grid;
+        gap: 20px;
+        margin-top: 40px;
+
+        & span {
+            color: var(--green600);
+        }
+
+        & label {
+            color: var(--grey500);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        & input {
+            color: var(--grey900);
+            cursor: pointer;
+        }
+
+        & input:not(input[type="radio"]):not(input[type="checkbox"]),
+        & textarea {
+            border: 1px solid var(--grey500);
+            outline: none;
+            width: 100%;
+            border-radius: 5px;
+            padding: 0 15px;
+            height: 50px;
+            font-size: 1rem;
+        }
+
+        & input:hover,
+        & input:focus {
+            border: 1px solid var(--green600) !important;
+        }
+
+        & .fullName,
+        & .query {
+            display: flex;
+            gap: 10px;
+
+            & > * {
+                flex-grow: 1;
+            }
+        }
+
+        & .query > label {
+            border: 1px solid var(--grey500);
+            height: 50px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+
+            &:hover {
+                cursor: pointer;
+                border: 1px solid var(--green600);
+            }
+
+            &.active {
+                border: 1px solid var(--green600);
+                background-color: var(--green200);
+            }
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            accent-color: var(--green600);
+        }
+
+        & textarea {
+            height: 100px;
+            padding: 10px 15px;
+            resize: vertical;
+        }
+
+        & label[for="contact"] {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            & > span {
+                margin-left: -10px;
+            }
+        }
+
+        & button {
+            height: 50px;
+            font-size: 1rem;
+            color: var(--white);
+            background-color: var(--green600);
+            border: none;
+            outline: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        & input.error,
+        & textarea.error {
+            border: 1px solid var(--red) !important;
+        }
+
+        & p.errorMsg {
+            margin-top: 5px;
+            color: var(--red);
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.success-state {
+    display: none;
+    position: fixed;
+    top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    color: var(--white);
+    background-color: var(--grey900);
+
+    & > .s {
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    main {
+        max-width: 450px;
+        padding: 30px 20px;
+
+        form {
+            & .fullName,
+            & .query {
+                flex-direction: column;
+
+                & > * {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .success-state {
+        width: 92%;
+        text-align: center;
+        justify-items: center;
+    }
+}
