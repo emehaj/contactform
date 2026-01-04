@@ -1,187 +1,131 @@
-const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// DOM elements
+const form = document.querySelector("form");
 const firstName = document.querySelector("#first-name");
 const lastName = document.querySelector("#last-name");
 const email = document.querySelector("#email");
+const message = document.querySelector("#message");
 
 const radioParent = document.querySelector(".query-type");
-const generalLabel = document.querySelector(`label[for="generalEnquiry"]`);
-const generalEnquiry = document.querySelector("#generalEnquiry");
-const supportLabel = document.querySelector(`label[for="supportRequest"]`);
-const supportRequest = document.querySelector("#supportRequest");
-const radioButtons = [generalEnquiry, supportRequest];
-let radioErrorMessage = document.createElement("p");
-radioErrorMessage.textContent = "Please select a query type";
-radioErrorMessage.classList.add("errorMsg");
+const radios = document.querySelectorAll('input[name="query-type"]');
+const generalLabel = document.querySelector('label[for="generalEnquiry"]');
+const supportLabel = document.querySelector('label[for="supportRequest"]');
 
-const userMessage = document.querySelector("#message");
-
-const acceptTerm = document.querySelector(".acceptTerm");
-const contactTerms = document.querySelector("#contact");
-let acceptErrorMessage = document.createElement("p");
-acceptErrorMessage.textContent =
-    "To submit this form, please consent to being contacted";
-acceptErrorMessage.classList.add("errorMsg");
+const termsWrapper = document.querySelector(".acceptTerm");
+const termsCheckbox = document.querySelector("#contact");
 
 const submitButton = document.querySelector("button");
+const successState = document.querySelector(".success-state");
 
-const fields = [firstName, lastName, email, userMessage];
+const fields = [firstName, lastName, email, message];
 
-const success_state = document.querySelector(".success-state");
+// Utility functions
+function showError(input, text) {
+    if (input.classList.contains("error")) return;
 
-submitButton.addEventListener("click", () => {
-    fields.forEach((field) => {
-        if (field.value === "" && !field.classList.contains("error")) {
-            field.classList.add("error");
+    input.classList.add("error");
+    const p = document.createElement("p");
+    p.className = "errorMsg";
+    p.textContent = text;
+    input.insertAdjacentElement("afterend", p);
+}
 
-            let errorMessage = document.createElement("p");
-            errorMessage.textContent = "This field is required";
-            errorMessage.classList.add("errorMsg");
-            field.insertAdjacentElement("afterend", errorMessage);
-        }
-    });
+function clearError(input) {
+    const error = input.nextElementSibling;
+    if (error && error.classList.contains("errorMsg")) {
+        error.remove();
+    }
+    input.classList.remove("error");
+}
 
-    if (!generalEnquiry.checked && !supportRequest.checked) {
-        radioParent.appendChild(radioErrorMessage);
+function validateField(input) {
+    if (!input.value.trim()) {
+        showError(input, "This field is required");
+        return false;
     }
 
-    if (!contactTerms.checked) {
-        acceptTerm.appendChild(acceptErrorMessage);
+    if (input.type === "email" && !emailRegex.test(input.value)) {
+        showError(input, "Enter a valid email");
+        return false;
     }
 
-    if (
-        firstName.value.length > 0 &&
-        firstName.value.length > 0 &&
-        emailRegex.test(email.value) &&
-        (generalEnquiry.checked || supportRequest.checked) &&
-        userMessage.value.length > 0 &&
-        contactTerms.checked
-    ) {
-        successState();
-    }
-});
+    clearError(input);
+    return true;
+}
 
+// Field validation
 fields.forEach((field) => {
-    field.addEventListener("keyup", () => {
-        if (
-            field.value.length > 0 &&
-            field.type !== "email" &&
-            field.classList.contains("error")
-        ) {
-            field.classList.remove("error");
-
-            let errorMessage = field.nextElementSibling;
-            errorMessage.remove();
-            errorMessage.classList.remove("errorMsg");
-        }
-    });
-
-    field.addEventListener("blur", () => {
-        if (field.value === "" && !field.classList.contains("error")) {
-            field.classList.add("error");
-
-            let errorMessage = document.createElement("p");
-            errorMessage.textContent = "This field is required";
-            errorMessage.classList.add("errorMsg");
-            field.insertAdjacentElement("afterend", errorMessage);
+    field.addEventListener("blur", () => validateField(field));
+    field.addEventListener("input", () => {
+        if (field.classList.contains("error")) {
+            validateField(field);
         }
     });
 });
 
-email.addEventListener("keyup", () => {
-    let errorMessage = email.nextElementSibling;
+// Radio buttons
+const radioError = document.createElement("p");
+radioError.className = "errorMsg";
+radioError.textContent = "Please select a query type";
 
-    if (
-        email.value.length >= 2 &&
-        email.classList.contains("error") &&
-        !emailRegex.test(email.value) &&
-        errorMessage.textContent === "This field is required"
-    ) {
-        errorMessage.textContent = "Enter a valid email";
-    }
-
-    if (
-        email.value.length >= 2 &&
-        !email.classList.contains("error") &&
-        !emailRegex.test(email.value) &&
-        !errorMessage
-    ) {
-        email.classList.add("error");
-
-        errorMessage = document.createElement("p");
-        errorMessage.textContent = "Enter a valid email";
-        errorMessage.classList.add("errorMsg");
-        email.insertAdjacentElement("afterend", errorMessage);
-    }
-
-    if (emailRegex.test(email.value) && errorMessage) {
-        email.classList.remove("error");
-
-        errorMessage.remove();
-    }
-});
-
-email.addEventListener("blur", () => {
-    let errorMessage = email.nextElementSibling;
-
-    if (
-        email.value.length > 0 &&
-        errorMessage &&
-        !emailRegex.test(email.value)
-    ) {
-        errorMessage.textContent = "Enter a value email";
-    }
-
-    if (
-        email.value.length > 0 &&
-        !errorMessage &&
-        !emailRegex.test(email.value)
-    ) {
-        errorMessage = document.createElement("p");
-        errorMessage.textContent = "Enter a valid email";
-        errorMessage.classList.add("errorMsg");
-        email.insertAdjacentElement("afterend", errorMessage);
-    }
-});
-
-radioButtons.forEach((radio) => {
-    radio.addEventListener("click", () => {
-        if (radio.checked) {
-            radioErrorMessage.remove();
-        }
-
-        if (radio.id === "generalEnquiry") {
-            generalLabel.classList.add("active");
-            supportLabel.classList.remove("active");
-        } else {
-            generalLabel.classList.remove("active");
-            supportLabel.classList.add("active");
-        }
+radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+        radioError.remove();
+        generalLabel.classList.toggle("active", radio.id === "generalEnquiry");
+        supportLabel.classList.toggle("active", radio.id === "supportRequest");
     });
 });
 
-contactTerms.addEventListener("click", () => {
-    if (contactTerms.checked) {
-        acceptErrorMessage.remove();
+// Terms checkbox
+const termsError = document.createElement("p");
+termsError.className = "errorMsg";
+termsError.textContent =
+    "To submit this form, please consent to being contacted";
+
+termsCheckbox.addEventListener("change", () => {
+    if (termsCheckbox.checked) {
+        termsError.remove();
     }
 });
 
-function successState() {
-    success_state.style.display = "grid";
+// Submit
+submitButton.addEventListener("click", (e) => {
+    e.preventDefault();
 
-    firstName.value = "";
-    lastName.value = "";
-    email.value = "";
-    generalEnquiry.checked = false;
-    supportRequest.checked = false;
-    generalLabel.classList.remove("active");
-    supportLabel.classList.remove("active");
-    userMessage.value = "";
-    contactTerms.checked = false;
+    let isValid = true;
+
+    fields.forEach((field) => {
+        if (!validateField(field)) {
+            isValid = false;
+        }
+    });
+
+    if (![...radios].some((r) => r.checked)) {
+        radioParent.appendChild(radioError);
+        isValid = false;
+    }
+
+    if (!termsCheckbox.checked) {
+        termsWrapper.appendChild(termsError);
+        isValid = false;
+    }
+
+    if (isValid) {
+        showSuccess();
+    }
+});
+
+function showSuccess() {
+    successState.style.display = "grid";
+    form.reset();
     submitButton.disabled = true;
 
+    generalLabel.classList.remove("active");
+    supportLabel.classList.remove("active");
+
     setTimeout(() => {
-        success_state.style.display = "none";
+        successState.style.display = "none";
         submitButton.disabled = false;
     }, 5000);
 }
